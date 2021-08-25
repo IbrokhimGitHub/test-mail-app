@@ -20,8 +20,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/register").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/api/auth/register","/feedback").permitAll()
+                .anyRequest().permitAll();
     }
 
     @Bean
@@ -31,18 +31,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JavaMailSender javaMailSender(){
         JavaMailSenderImpl mailSender=new JavaMailSenderImpl();
+//        mailSender.setProtocol("smtp");
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("i.irmukhamedov@gmail.com");
-        mailSender.setPassword("i4606044");
+        mailSender.setUsername("testforjavaspring@gmail.com");
+        mailSender.setPassword("4606044i");
         Properties properties=mailSender.getJavaMailProperties();
         properties.put("mail.transport.protocol","smtp");
-        properties.put("mail.smtp.auth",true);
-        properties.put("mail.smtp.starttls.enable",true);
+        properties.put("mail.smtp.auth","true");
+        properties.put("mail.smtp.starttls.enable","true");
         properties.put("mail.debug","true");
-        properties.put("mail.smtp.timeout", 5000);
-        properties.put("mail.smtp.connectiontimeout", 5000);
-        properties.put("mail.smtp.writetimeout", 5000);
+//        properties.setProperty("protocol","smtp");
+//        properties.put("mail.smtp.timeout", 5000);
+//        properties.put("mail.smtp.connectiontimeout", 5000);
+//        properties.put("mail.smtp.writetimeout", 5000);
 //        properties.put("mail.smtps.ssl.checkserveridentity",true);
 //        properties.put("mail.smtps.ssl.trust","*");
         System.out.println(mailSender);

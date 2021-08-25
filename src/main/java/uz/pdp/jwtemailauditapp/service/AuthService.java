@@ -3,11 +3,14 @@ package uz.pdp.jwtemailauditapp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.pdp.jwtemailauditapp.enitity.Role;
 import uz.pdp.jwtemailauditapp.enitity.User;
 import uz.pdp.jwtemailauditapp.enitity.enums.RoleName;
+import uz.pdp.jwtemailauditapp.mailTrap.EmailCfg;
+import uz.pdp.jwtemailauditapp.mailTrap.Feedback;
 import uz.pdp.jwtemailauditapp.payload.ApiResponse;
 import uz.pdp.jwtemailauditapp.payload.RegisterDto;
 import uz.pdp.jwtemailauditapp.repository.RoleRepository;
@@ -29,6 +32,9 @@ public class AuthService {
     @Autowired
     JavaMailSender javaMailSender;
 
+    @Autowired
+    EmailCfg emailCfg;
+
     public ApiResponse registerUser(RegisterDto registerDto) {
         boolean existsByEmail = userRepository.existsByEmail(registerDto.getEmail());
         if (existsByEmail) {
@@ -44,19 +50,38 @@ public class AuthService {
         user.setEmailCode(UUID.randomUUID().toString());
 
 
-
-
         Boolean aBoolean = sendEmail(user.getEmail(), user.getEmailCode());
         if (aBoolean) {
             userRepository.save(user);
             return new ApiResponse("verify your email please", true);
-        }else {
+        } else {
             return new ApiResponse("something went wrong", false);
         }
 
 
-
     }
+
+//    public Boolean sendEmail(String sendingEmail, String emailCode, Feedback feedback) {
+//        try {
+//            JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+//            mailSender.setHost(this.emailCfg.getHost());
+//            mailSender.setPort(this.emailCfg.getPort());
+//            mailSender.setPassword(this.emailCfg.getPassword());
+//            mailSender.setUsername(this.emailCfg.getUsername());
+//
+//
+//            SimpleMailMessage mailMessage = new SimpleMailMessage();
+//            mailMessage.setFrom("i.irmukhamedov@gmail.com");
+//            mailMessage.setTo("rc@deefback.com");
+//            mailMessage.setSubject("new feedback from" + feedback.getName());
+//            mailMessage.setText("this is feed back");
+//
+//            mailSender.send(mailMessage);
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 
     public Boolean sendEmail(String sendingEmail, String emailCode) {
         try {
@@ -66,9 +91,10 @@ public class AuthService {
             simpleMailMessage.setSubject("verify your email");
             simpleMailMessage.setText("<a href='http://localhost:8080/api/auth/verifyEmail?emailCode=" + emailCode + "&email=" + sendingEmail + "'>Tasdiqlash linki</a>");
             javaMailSender.send(simpleMailMessage);
+
             return true;
         } catch (Exception e) {
-            return false;
+       return false;
         }
 
     }
